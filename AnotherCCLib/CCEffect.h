@@ -1,13 +1,16 @@
-#pragma once
+#ifndef CCEFFECT_H
+#define CCEFFECT_H
 #include <string>
 #include <nlohmann/json.hpp>
 #include <iostream>
-//#include "CCConnector.h"
+#include "CCConnector.h"
+
 using json = nlohmann::json;
 
 class CCEffect
 {
 public:
+	CCConnector* connector;
 	CCEffect* type;
 	std::string code;
 	json message;
@@ -18,3 +21,5 @@ public:
 	uint64_t timeleft; // Time in ms
 	
 };
+
+#endif

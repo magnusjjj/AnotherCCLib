@@ -1,4 +1,7 @@
-#pragma once
+#ifndef CCCONNECTOR_H
+#define CCCONNECTOR_H
+
+
 #include "CCEffect.h"
 #include <regex>
 #include <WinSock2.h>
@@ -38,3 +41,4 @@ public:
 	void PauseTimerThread(bool timerthreadshouldbeactive);
 };
 
+#endif // !CCCONNECTOR_H
