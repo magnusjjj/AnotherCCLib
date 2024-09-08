@@ -15,7 +15,7 @@ public:
 	std::string code;
 	json message;
 	void Respond(json response);
-	//void RespondOK();
+	void RespondOK();
 	virtual void Start() = 0;
 	virtual void Stop() = 0;
 	uint64_t timeleft; // Time in ms

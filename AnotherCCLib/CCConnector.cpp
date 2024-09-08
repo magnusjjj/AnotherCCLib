@@ -5,6 +5,7 @@
 #include <nlohmann/json.hpp>
 using json = nlohmann::json;
 #include "CCMessages.h"
+#include "CCEffect.h"
 
 /// <summary>
 /// Tries to open communication with the crowd control server locally.
@@ -51,6 +52,8 @@ void CCConnector::OnTCPMessageCallbackReal(const char* message) {
 				const std::string code = data["code"];
 				if (std::regex_match(code, *n.first)) {
 					CCEffect* neweffect = effectmap[n.first]();
+					neweffect->message = data;
+					neweffect->connector = this;
 					if (data.contains("duration"))
 					{
 						uint64_t duration = data["duration"];

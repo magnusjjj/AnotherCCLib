@@ -1,12 +1,4 @@
 #pragma once
-class CCRequest
-{
-};
-
-class CCResponse {
-
-};
-
 enum CCResponseType
 {
     EffectRequest = 0x00,
@@ -34,4 +26,16 @@ enum CCRequestType {
     RequestLogin = 0xF0,
     RequestGameUpdate = 0xFD,
     RequestKeepAlive = 0xFF
+};
+
+enum CCEffectStatus {
+    Success = 0x00,
+    Failure = 0x01,
+    Unavailable = 0x02,
+    Retry = 0x03,
+    Queue = 0x04,
+    Running = 0x05,
+    Pauseed = 0x06,
+    Resumed = 0x07,
+    Finished = 0x08
 };

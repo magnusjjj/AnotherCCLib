@@ -2,7 +2,7 @@
 #define CCCONNECTOR_H
 
 
-#include "CCEffect.h"
+//#include "CCEffect.h"
 #include <regex>
 #include <WinSock2.h>
 #include <map>
@@ -11,6 +11,7 @@
 #include <mutex>
 #include "SimpleNullTerminatedTCPSocket.h"
 
+class CCEffect;
 typedef CCEffect* (*CCCallback2)();
 
 class CCConnector
