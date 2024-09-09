@@ -25,6 +25,7 @@ public:
 	bool connecting = false;
 	void ResetError();
 	bool Connect(const char* host, const char* port);
+	void Send(const char* string);
 	void Run();
 	void SetMessageCallback(std::function<void(const char* message)> f);
 };

@@ -106,6 +106,10 @@ bool SimpleNullTerminatedTCPSocket::Connect(const char* host, const char* port)
 	return false;
 }
 
+void SimpleNullTerminatedTCPSocket::Send(const char* string) {
+	send(this->m_socket, string, (int)strlen(string) + 1, 0);
+}
+
 void SimpleNullTerminatedTCPSocket::Run()
 {
 	value_lock<bool> run_lock(&running, true, false);

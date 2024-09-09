@@ -35,7 +35,7 @@ enum CCEffectStatus {
     Retry = 0x03,
     Queue = 0x04,
     Running = 0x05,
-    Pauseed = 0x06,
+    Paused = 0x06,
     Resumed = 0x07,
     Finished = 0x08
 };

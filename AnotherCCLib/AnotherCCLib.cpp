@@ -13,6 +13,11 @@ using namespace std;
 
 // Todo:
 // Handle disconnections
+// Memory leaks
+// Stress tests
+// Logging callbacks
+// Respond to status messages
+// Write tests
 
 int main()
 {

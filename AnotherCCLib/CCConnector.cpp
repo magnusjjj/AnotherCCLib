@@ -28,10 +28,6 @@ bool CCConnector::Connect()
 	return this->connection->Connect("localhost", "5420");
 }
 
-
-
-
-
 void CCConnector::OnTCPMessageCallbackReal(const char* message) {
 
 	json data = json::parse(message);
@@ -59,7 +55,9 @@ void CCConnector::OnTCPMessageCallbackReal(const char* message) {
 						uint64_t duration = data["duration"];
 						if (duration > 0) {
 							neweffect->timeleft = duration;
+							runningEffectsMutex.lock();
 							runningeffects.push_back(neweffect);
+							runningEffectsMutex.unlock();
 						}
 					}
 					neweffect->Start();
@@ -70,7 +68,6 @@ void CCConnector::OnTCPMessageCallbackReal(const char* message) {
 			this->connection->_WARNING("Unhandled message from crowd control: %s\n", message);
 			break;
 	}
-	this->connection->_MESSAGE("HELLOOOO");
 }
 
 void CCConnector::AddEffect(std::regex* code_matcher, CCCallback2 factory)
@@ -83,9 +80,12 @@ void CCConnector::StartTimerThread()
 	this->timerThread = new std::thread(&CCConnector::RunTimerThread, this);
 }
 
-// TODO:
-// Locks around effects
-// Memory leaks
+void CCConnector::Send(const char* message) {
+	this->connection->_MESSAGE("Sent.. %s", message);
+	this->connection->Send(message);
+}
+
+
 
 void CCConnector::RunTimerThread() {
 	std::chrono::steady_clock::time_point lastTime = std::chrono::steady_clock::now();
@@ -106,6 +106,8 @@ void CCConnector::RunTimerThread() {
 		
 		ULONGLONG msSinceLastTime = std::chrono::duration_cast<std::chrono::milliseconds>(ticks - lastTime).count();
 
+		runningEffectsMutex.lock();
+
 		runningeffects.remove_if([msSinceLastTime](CCEffect* e) {
 			if (e->timeleft > msSinceLastTime)
 			{
@@ -114,9 +116,12 @@ void CCConnector::RunTimerThread() {
 			}
 			else {
 				e->Stop();
+				e->RespondFinished();
 				return true; // TODO: MEMORY LEAK?
 			}
 		});
+
+		runningEffectsMutex.unlock();
 
 		lastTime = std::chrono::steady_clock::now();
 
@@ -135,5 +140,19 @@ void CCConnector::PauseTimerThread(bool timerthreadshouldbeactive = false)
 	}
 	else {
 		this->timerPause = false;
+	}
+
+	std::lock_guard<std::mutex> lockrunning(runningEffectsMutex);
+	
+
+	if(timerthreadshouldbeactive){
+		for (const auto& a : runningeffects) {
+			a->RespondPause();
+		}
+	}
+	else {
+		for (const auto& a : runningeffects) {
+			a->RespondUnpaused();
+		}
 	}
 }

@@ -20,7 +20,7 @@ class CCConnector
 	void OnTCPMessageCallbackReal(const char* message);
 	std::map<std::regex*, CCCallback2> effectmap;
 	std::list<CCEffect*> runningeffects;
-
+	std::mutex runningEffectsMutex;
 
 
 	// Timer thread variables
@@ -39,6 +39,7 @@ public:
 	bool hasError = false;
 	char error[100] = "";
 	void StartTimerThread();
+	void Send(const char* message);
 	void PauseTimerThread(bool timerthreadshouldbeactive);
 };
 
