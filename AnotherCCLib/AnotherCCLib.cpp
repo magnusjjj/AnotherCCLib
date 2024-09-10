@@ -19,6 +19,8 @@ using namespace std;
 // Respond to status messages
 // Write tests
 // Responses for *failure* and simple blocking.
+// Respect the 'stop all effects of type %s' message.
+// Write documentation
 
 int main()
 {
