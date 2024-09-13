@@ -1,7 +1,7 @@
 #ifndef CCEFFECT_H
 #define CCEFFECT_H
 #include <string>
-#include <nlohmann/json.hpp>
+#include "AnotherCCLib/nlohmann/json.hpp"
 #include <iostream>
 #include "CCConnector.h"
 #include "CCMessages.h"
@@ -15,6 +15,7 @@ public:
 	CCEffect* type;
 	std::string code;
 	json message;
+	std::vector<std::string>* arguments;
 	void Respond(json response);
 	void RespondSimple(CCEffectStatus status);
 	void RespondOK();

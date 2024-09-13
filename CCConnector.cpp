@@ -2,10 +2,12 @@
 #include <mutex>
 #include "CCLock.h"
 #include <functional>
-#include <nlohmann/json.hpp>
+#include "AnotherCCLib/nlohmann/json.hpp"
 using json = nlohmann::json;
 #include "CCMessages.h"
 #include "CCEffect.h"
+#include <chrono>
+using namespace std;
 
 /// <summary>
 /// Tries to open communication with the crowd control server locally.
@@ -25,7 +27,31 @@ bool CCConnector::Connect()
 	this->connection = new SimpleNullTerminatedTCPSocket();
 	auto callback = std::bind(&CCConnector::OnTCPMessageCallbackReal, this, std::placeholders::_1);
 	this->connection->SetMessageCallback(callback);
-	return this->connection->Connect("localhost", "5420");
+	
+	while(true){
+		while (true) {
+			if (this->connection->Connect("localhost", "5420")) {
+				break;
+			}
+			else {
+				if (hasError)
+				{
+					_MESSAGE(error);
+				}
+				std::this_thread::sleep_for(500ms);
+			}
+
+		}
+
+		std::cout << "Connected!" << std::endl;
+		StartTimerThread();
+
+		while (true) {
+			if (this->connection->hasError)
+				break;
+			std::this_thread::sleep_for(500ms);
+		}
+	}
 }
 
 void CCConnector::OnTCPMessageCallbackReal(const char* message) {
@@ -46,10 +72,19 @@ void CCConnector::OnTCPMessageCallbackReal(const char* message) {
 			this->connection->_WARNING("A start of something nice: %s\n", message);
 			for (const auto& n : effectmap) {
 				const std::string code = data["code"];
-				if (std::regex_match(code, *n.first)) {
+				std::cmatch tosend;
+				std::vector<string>* arguments = new vector<string>();
+				if (std::regex_match(code.c_str(), tosend, *n.first)) {
+
+					for (std::cmatch::iterator it = tosend.begin(); it != tosend.end(); ++it){
+						arguments->push_back(it->str());
+					}
+
 					CCEffect* neweffect = effectmap[n.first]();
 					neweffect->message = data;
 					neweffect->connector = this;
+					neweffect->arguments = arguments;
+
 					if (data.contains("duration"))
 					{
 						uint64_t duration = data["duration"];
@@ -77,7 +112,8 @@ void CCConnector::AddEffect(std::regex* code_matcher, CCCallback2 factory)
 
 void CCConnector::StartTimerThread()
 {
-	this->timerThread = new std::thread(&CCConnector::RunTimerThread, this);
+	if(timerThread == NULL)
+		this->timerThread = new std::thread(&CCConnector::RunTimerThread, this);
 }
 
 void CCConnector::Send(const char* message) {
